@@ -1,0 +1,18 @@
+{
+  "name": "MedRevise - MBBS Revision Planner",
+  "short_name": "MedRevise",
+  "description": "Spaced repetition revision planner for MBBS students",
+  "start_url": "/medrevise/index.html",
+  "scope": "/medrevise/",
+  "display": "standalone",
+  "background_color": "#FAFAF9",
+  "theme_color": "#D4537E",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://em-content.zobj.net/source/apple/354/cherry-blossom_1f338.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
