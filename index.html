@@ -653,13 +653,15 @@ function addTopic(){
   flash('"'+topic+'" added! Revisions: Day 1, 3, 5, 7 & 15 🌸');
 }
 function markRevised(id,idx){
-  const t=topics.find(x=>x.id===id);if(!t)return;
+  id=Number(id);idx=Number(idx);
+  const t=topics.find(x=>Number(x.id)===id);if(!t)return;
   t.revisedOn[idx]=true;save();render();
   flash(status(t)==='done'?'All done for "'+t.topic+'"! 💪':'Day '+REV_DAYS[idx]+' marked ✓ 🌸');
 }
 function deleteTopic(id){
+  id=Number(id);
   if(!confirm('Delete this topic?'))return;
-  topics=topics.filter(x=>x.id!==id);save();render();
+  topics=topics.filter(x=>Number(x.id)!==id);save();render();
 }
 function save(){localStorage.setItem('medrevise_v7',JSON.stringify(topics));}
 function setTab(t){
@@ -695,8 +697,8 @@ function render(){
     const pills=revs.map(r=>'<span class="pill '+(r.done?'p-done':r.diff<0?'p-ov':r.diff===0?'p-td':'p-next')+'">Day '+r.day+(r.done?' ✓':'')+'</span>').join('');
     const next=revs.find(r=>!r.done);
     const badge=t._s==='overdue'?'<span class="stbadge st-ov">Overdue</span>':t._s==='today'?'<span class="stbadge st-td">Due Today</span>':'';
-    const markBtn=next?'<button class="btn-mark" onclick="markRevised('+t.id+','+next.i+')">Mark Day '+next.day+'</button>':'<span class="done-txt">All done ✓</span>';
-    return'<div class="card '+cls+'"><div class="ctop"><span class="sbadge" style="background:'+c+'18;color:'+c+'">'+t.subject+'</span><div class="cmeta">'+badge+'<span class="studied">'+fmt(t.studiedDate)+'</span></div></div><div class="ctopic">'+t.topic+'</div>'+(t.concepts?'<div class="cconcepts">'+t.concepts+'</div>':'')+'<div class="pills">'+pills+'</div><div class="cfoot"><div class="cfoot-left">'+markBtn+'<button class="btn-ask" onclick="openChat('+t.id+')">✨ Ask AI</button></div><button class="btn-del" onclick="deleteTopic('+t.id+')">✕</button></div></div>';
+    const markBtn=next?'<button class="btn-mark" data-id="'+t.id+'" data-idx="'+next.i+'" onclick="markRevised(this.dataset.id,this.dataset.idx)">Mark Day '+next.day+'</button>':'<span class="done-txt">All done ✓</span>';
+    return'<div class="card '+cls+'"><div class="ctop"><span class="sbadge" style="background:'+c+'18;color:'+c+'">'+t.subject+'</span><div class="cmeta">'+badge+'<span class="studied">'+fmt(t.studiedDate)+'</span></div></div><div class="ctopic">'+t.topic+'</div>'+(t.concepts?'<div class="cconcepts">'+t.concepts+'</div>':'')+'<div class="pills">'+pills+'</div><div class="cfoot"><div class="cfoot-left">'+markBtn+'<button class="btn-ask" data-id="'+t.id+'" onclick="openChat(this.dataset.id)">✨ Ask AI</button></div><button class="btn-del" onclick="deleteTopic('+t.id+')">✕</button></div></div>';
   }).join('');
 }
 
