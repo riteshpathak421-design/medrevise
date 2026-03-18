@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>MedRevise 🌸</title>
+  <meta name="theme-color" content="#D4537E"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="apple-mobile-web-app-title" content="MedRevise"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="apple-touch-icon" href="https://em-content.zobj.net/source/apple/354/cherry-blossom_1f338.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --pink:#D4537E; --pink-l:#FBEAF0; --pink-d:#993556; --pink-b:#F4C0D1;
+      --rose:#72243E; --green:#1D9E75; --green-l:#EAF3DE;
+      --amber:#EF9F27; --amber-l:#FAEEDA; --red:#E24B4A; --red-l:#FCEBEB;
+      --bg:#FAFAF9; --card:#FFFFFF; --border:rgba(0,0,0,0.09);
+      --text:#1A1A1A; --muted:#6B6B6B; --hint:#ADADAD;
+      --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
+    .app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+
+    /* Header */
+    .hdr{background:var(--card);border-bottom:1px solid var(--border);padding:calc(var(--sat) + 14px) 18px 14px;position:sticky;top:0;z-index:100}
+    .hrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:600}
+    .logo span{color:var(--pink)}
+    .btn-settings{background:none;border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif}
+    .hdate{font-size:12px;color:var(--muted)}
+    .stats{display:flex;gap:8px}
+    .stat{flex:1;background:var(--bg);border-radius:10px;padding:8px;text-align:center}
+    .stat .n{font-size:18px;font-weight:500}
+    .stat .l{font-size:10px;color:var(--muted);margin-top:1px}
+    .stat.warn .n{color:var(--amber)}
+    .stat.ok .n{color:var(--green)}
+
+    /* Settings drawer */
+    .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:none}
+    .drawer-overlay.open{display:block}
+    .drawer{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--card);border-radius:24px 24px 0 0;padding:20px 20px calc(var(--sab) + 20px);z-index:201;animation:slideUp .3s ease}
+    @keyframes slideUp{from{transform:translateX(-50%) translateY(100%)}to{transform:translateX(-50%) translateY(0)}}
+    .drawer-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px}
+    .drawer-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:4px}
+    .drawer-sub{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+    .setting-block{background:var(--bg);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+    .setting-label{font-size:11px;font-weight:500;color:var(--pink);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px}
+    .setting-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .setting-desc{font-size:13px;color:var(--text);font-weight:500}
+    .setting-hint{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
+    .time-input{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:15px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none;min-width:110px;text-align:center}
+    .time-input:focus{border-color:var(--pink)}
+    .topic-input{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none;width:100%;margin-top:8px}
+    .topic-input:focus{border-color:var(--pink)}
+    .topic-input::placeholder{color:var(--hint)}
+    .btn-save{background:var(--pink);color:white;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;width:100%;margin-top:4px}
+    .btn-save:active{background:var(--pink-d)}
+    .ntfy-status{display:flex;align-items:center;gap:8px;font-size:13px;padding:10px 0}
+    .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .dot.on{background:var(--green)}
+    .dot.off{background:var(--amber)}
+    .step-list{list-style:none;counter-reset:steps}
+    .step-list li{counter-increment:steps;display:flex;gap:10px;font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5}
+    .step-list li::before{content:counter(steps);background:var(--pink);color:white;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0;margin-top:1px}
+    .step-list li b{color:var(--text);font-weight:500}
+
+    /* Alert modal */
+    .alert-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:300;display:flex;align-items:flex-end;justify-content:center;padding-bottom:calc(var(--sab) + 16px)}
+    .alert-overlay.hidden{display:none}
+    .alert-sheet{background:var(--card);border-radius:24px 24px 16px 16px;padding:24px 20px 20px;width:100%;max-width:480px;animation:slideUp .3s ease}
+    .alert-icon{font-size:36px;text-align:center;margin-bottom:8px}
+    .alert-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;text-align:center;margin-bottom:4px}
+    .alert-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:16px}
+    .alert-rows{display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto;margin-bottom:16px}
+    .alert-row{display:flex;justify-content:space-between;align-items:center;background:var(--bg);border-radius:12px;padding:10px 14px}
+    .ar-name{font-size:13px;font-weight:500}
+    .ar-sub{font-size:11px;color:var(--muted);margin-top:2px}
+    .ar-badge{font-size:10px;font-weight:500;padding:3px 9px;border-radius:20px;flex-shrink:0}
+    .ab-ov{background:var(--red-l);color:#A32D2D}
+    .ab-td{background:var(--amber-l);color:#854F0B}
+    .btn-dismiss{width:100%;background:var(--pink);color:white;border:none;border-radius:14px;padding:13px;font-size:15px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer}
+
+    /* Flash */
+    .flash{margin:8px 16px;padding:10px 14px;background:var(--pink-l);border:1px solid var(--pink-b);border-radius:12px;font-size:13px;color:var(--rose);display:none;align-items:center;gap:8px}
+    .flash.show{display:flex;animation:fi .3s ease}
+    @keyframes fi{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
+    /* Add form */
+    .add-wrap{padding:14px 16px}
+    .add-card{background:var(--card);border-radius:16px;border:1px solid var(--border);padding:16px}
+    .form-head{font-size:11px;font-weight:500;color:var(--pink);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+    .fg{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+    .fg label{font-size:10px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px}
+    .fg select,.fg input,.fg textarea{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none;transition:border-color .2s}
+    .fg select:focus,.fg input:focus,.fg textarea:focus{border-color:var(--pink)}
+    .fg textarea{min-height:68px;resize:none}
+    .btn-add{width:100%;background:var(--pink);color:white;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .2s,transform .1s}
+    .btn-add:active{transform:scale(0.98);background:var(--pink-d)}
+
+    /* Tabs */
+    .tabs-wrap{padding:0 16px 4px}
+    .tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+    .tabs::-webkit-scrollbar{display:none}
+    .tab{flex-shrink:0;font-size:12px;font-weight:500;padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+    .tab.active{background:var(--pink-l);border-color:var(--pink);color:var(--pink-d)}
+    .bdg{background:var(--hint);color:white;border-radius:10px;font-size:10px;padding:1px 6px;min-width:18px;text-align:center}
+    .tab.active .bdg{background:var(--pink)}
+
+    /* List */
+    .list-wrap{padding:10px 16px 100px;flex:1}
+    .list-lbl{font-size:11px;font-weight:500;color:var(--hint);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px}
+    .card{background:var(--card);border-radius:16px;border:1px solid var(--border);padding:14px 16px;margin-bottom:10px}
+    .card.overdue{border-left:3px solid var(--red)}
+    .card.due-today{border-left:3px solid var(--amber)}
+    .card.upcoming{border-left:3px solid var(--green)}
+    .ctop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+    .sbadge{font-size:10px;font-weight:500;padding:3px 10px;border-radius:20px}
+    .cmeta{display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .stbadge{font-size:10px;font-weight:500;padding:3px 8px;border-radius:20px}
+    .st-ov{background:var(--red-l);color:#A32D2D}
+    .st-td{background:var(--amber-l);color:#854F0B}
+    .ctopic{font-size:15px;font-weight:500;margin-bottom:4px}
+    .cconcepts{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:10px}
+    .studied{font-size:11px;color:var(--hint)}
+    .pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+    .pill{font-size:10px;font-weight:500;padding:3px 9px;border-radius:20px}
+    .p-done{background:var(--green-l);color:#3B6D11}
+    .p-ov{background:var(--red-l);color:#A32D2D}
+    .p-td{background:var(--amber-l);color:#854F0B}
+    .p-next{background:var(--bg);color:var(--hint);border:1px solid var(--border)}
+    .cfoot{display:flex;justify-content:space-between;align-items:center}
+    .btn-mark{font-size:12px;font-weight:500;padding:6px 14px;border-radius:20px;border:1px solid var(--pink);background:transparent;color:var(--pink);cursor:pointer;font-family:'DM Sans',sans-serif}
+    .btn-mark:active{background:var(--pink);color:white}
+    .btn-del{font-size:12px;padding:6px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--hint);cursor:pointer;font-family:'DM Sans',sans-serif}
+    .done-txt{font-size:12px;font-weight:500;color:var(--green)}
+    .empty{text-align:center;padding:48px 20px;color:var(--muted)}
+    .empty .ico{font-size:36px;margin-bottom:10px}
+    .empty p{font-size:14px;line-height:1.6}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Alert modal -->
+  <div class="alert-overlay hidden" id="alert-overlay">
+    <div class="alert-sheet">
+      <div class="alert-icon" id="alert-icon">📚</div>
+      <div class="alert-title" id="alert-title">Topics due today!</div>
+      <div class="alert-sub" id="alert-sub">Let's get these done 💪</div>
+      <div class="alert-rows" id="alert-rows"></div>
+      <button class="btn-dismiss" onclick="dismissAlert()">Let's revise! 🌸</button>
+    </div>
+  </div>
+
+  <!-- Settings drawer overlay -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="closeSettings()"></div>
+  <div class="drawer" id="drawer" style="display:none">
+    <div class="drawer-handle"></div>
+    <div class="drawer-title">Reminder settings</div>
+    <div class="drawer-sub">Uses ntfy.sh — a free service that sends real notifications to your iPhone with sound, even when the app is closed.</div>
+
+    <!-- Step 1: ntfy topic -->
+    <div class="setting-block">
+      <div class="setting-label">Step 1 — Your private topic name</div>
+      <div class="setting-desc">Create a unique name (no spaces)</div>
+      <div class="setting-hint">e.g. medrevise-ritesh-421 — this is your private channel</div>
+      <input type="text" class="topic-input" id="ntfy-topic" placeholder="e.g. medrevise-ritesh-421" autocapitalize="none" autocorrect="off"/>
+    </div>
+
+    <!-- Step 2: time -->
+    <div class="setting-block">
+      <div class="setting-label">Step 2 — Daily reminder time</div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-desc">Send notification at</div>
+          <div class="setting-hint">Every day at this time</div>
+        </div>
+        <input type="time" class="time-input" id="reminder-time" value="08:00"/>
+      </div>
+    </div>
+
+    <!-- Step 3: ntfy app setup -->
+    <div class="setting-block">
+      <div class="setting-label">Step 3 — Install ntfy on iPhone (once only)</div>
+      <ul class="step-list">
+        <li>Download <b>ntfy</b> from the App Store (free, by binwiederhier)</li>
+        <li>Open ntfy → tap <b>+</b> → type your topic name above → Subscribe</li>
+        <li>Allow notifications when prompted</li>
+        <li>Done! Notifications will arrive every day at your set time 🌸</li>
+      </ul>
+    </div>
+
+    <!-- Status -->
+    <div class="setting-block" style="margin-bottom:16px">
+      <div class="setting-label">Status</div>
+      <div class="ntfy-status">
+        <div class="dot" id="ntfy-dot" style="background:var(--hint)"></div>
+        <span id="ntfy-status-text">Not configured yet</span>
+      </div>
+      <button class="btn-save" id="btn-test" onclick="testNtfy()" style="background:var(--bg);color:var(--pink);border:1px solid var(--pink);margin-top:8px;display:none">Send test notification</button>
+    </div>
+
+    <button class="btn-save" onclick="saveSettings()">Save & activate reminders 🌸</button>
+  </div>
+
+  <!-- Header -->
+  <div class="hdr">
+    <div class="hrow">
+      <div class="logo">Med<span>Revise</span> 🌸</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="hdate" id="hdate"></div>
+        <button class="btn-settings" onclick="openSettings()">⚙ Reminders</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n" id="s-total">0</div><div class="l">Topics</div></div>
+      <div class="stat warn"><div class="n" id="s-due">0</div><div class="l">Due Today</div></div>
+      <div class="stat ok"><div class="n" id="s-done">0</div><div class="l">Completed</div></div>
+    </div>
+  </div>
+
+  <div id="flash" class="flash"><span>💗</span><span id="flash-text"></span></div>
+
+  <!-- Add form -->
+  <div class="add-wrap">
+    <div class="add-card">
+      <div class="form-head">+ Topic studied today</div>
+      <div class="row2">
+        <div class="fg" style="margin-bottom:0">
+          <label>Subject</label>
+          <select id="inp-subj">
+            <option>Anatomy</option><option>Physiology</option><option>Biochemistry</option>
+            <option>Pathology</option><option>Pharmacology</option><option>Microbiology</option>
+            <option>Medicine</option><option>Surgery</option><option>Obs &amp; Gynae</option>
+            <option>Pediatrics</option><option>PSM</option><option>ENT</option>
+            <option>Ophthalmology</option><option>Other</option>
+          </select>
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Topic name</label>
+          <input id="inp-topic" placeholder="e.g. Brachial plexus"/>
+        </div>
+      </div>
+      <div style="height:10px"></div>
+      <div class="fg">
+        <label>Key concepts / important points</label>
+        <textarea id="inp-concepts" placeholder="e.g. Roots C5-T1 • Erb's palsy upper trunk • LOAF muscles..."></textarea>
+      </div>
+      <button class="btn-add" onclick="addTopic()">Add to revision schedule 🌸</button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-wrap">
+    <div class="tabs">
+      <div class="tab active" onclick="setTab('all')" id="tab-all">All <span class="bdg" id="c-all">0</span></div>
+      <div class="tab" onclick="setTab('overdue')" id="tab-overdue">Overdue <span class="bdg" id="c-overdue">0</span></div>
+      <div class="tab" onclick="setTab('today')" id="tab-today">Today <span class="bdg" id="c-today">0</span></div>
+      <div class="tab" onclick="setTab('upcoming')" id="tab-upcoming">Upcoming <span class="bdg" id="c-upcoming">0</span></div>
+      <div class="tab" onclick="setTab('done')" id="tab-done">Done <span class="bdg" id="c-done">0</span></div>
+    </div>
+  </div>
+
+  <!-- List -->
+  <div class="list-wrap">
+    <div class="list-lbl" id="list-lbl">All topics</div>
+    <div id="topic-list"></div>
+  </div>
+</div>
+
+<script>
+const REV_DAYS=[1,3,5,7,15];
+const COLORS={'Anatomy':'#D4537E','Physiology':'#534AB7','Biochemistry':'#0F6E56','Pathology':'#993C1D','Pharmacology':'#185FA5','Microbiology':'#3B6D11','Medicine':'#BA7517','Surgery':'#A32D2D','Obs & Gynae':'#72243E','Pediatrics':'#0C447C','PSM':'#3C3489','ENT':'#854F0B','Ophthalmology':'#1D9E75','Other':'#5F5E5A'};
+
+let topics=JSON.parse(localStorage.getItem('medrevise_v6')||'[]');
+let tab='all';
+let ntfyTimer=null;
+
+function tod(){const d=new Date();d.setHours(0,0,0,0);return d;}
+function diffDays(a,b){return Math.floor((b-a)/86400000);}
+
+function revisions(t){
+  const s=new Date(t.studiedDate);s.setHours(0,0,0,0);
+  return REV_DAYS.map((d,i)=>{
+    const due=new Date(s);due.setDate(due.getDate()+d);
+    return{day:d,due,diff:diffDays(tod(),due),done:!!(t.revisedOn&&t.revisedOn[i]),i};
+  });
+}
+
+function status(t){
+  const p=revisions(t).filter(r=>!r.done);
+  if(!p.length)return'done';
+  if(p[0].diff<0)return'overdue';
+  if(p[0].diff===0)return'today';
+  return'upcoming';
+}
+
+// ---- ntfy notification ----
+function buildNtfyMessage(){
+  const overdue=topics.filter(t=>status(t)==='overdue');
+  const due=topics.filter(t=>status(t)==='today');
+  const all=[...overdue,...due];
+  if(!all.length)return null;
+  const title=overdue.length>0
+    ?'⚠️ '+overdue.length+' overdue + '+due.length+' due today'
+    :'📚 '+due.length+' topic'+(due.length>1?'s':'')+' due for revision today';
+  const body=all.slice(0,5).map(t=>{
+    const next=revisions(t).find(r=>!r.done);
+    return(status(t)==='overdue'?'🔴':'🟡')+' '+t.topic+(next?' (Day '+next.day+')':'');
+  }).join('\n')+(all.length>5?'\n...and '+(all.length-5)+' more':'');
+  return{title,body};
+}
+
+async function sendNtfy(){
+  const topic=localStorage.getItem('ntfyTopic');
+  if(!topic)return;
+  const msg=buildNtfyMessage();
+  if(!msg)return;
+  try{
+    await fetch('https://ntfy.sh/'+topic,{
+      method:'POST',
+      headers:{'Title':msg.title,'Priority':'high','Tags':'books,cherry_blossom'},
+      body:msg.body
+    });
+  }catch(e){console.warn('ntfy send failed',e);}
+}
+
+function scheduleNtfy(){
+  if(ntfyTimer){clearTimeout(ntfyTimer);clearInterval(ntfyTimer);ntfyTimer=null;}
+  const topic=localStorage.getItem('ntfyTopic');
+  const time=localStorage.getItem('reminderTime')||'08:00';
+  if(!topic)return;
+  const[h,m]=time.split(':').map(Number);
+  const now=new Date();
+  const next=new Date(now);
+  next.setHours(h,m,0,0);
+  if(next<=now)next.setDate(next.getDate()+1);
+  const delay=next-now;
+  ntfyTimer=setTimeout(()=>{
+    sendNtfy();
+    ntfyTimer=setInterval(sendNtfy,86400000);
+  },delay);
+}
+
+async function testNtfy(){
+  const topic=document.getElementById('ntfy-topic').value.trim()||localStorage.getItem('ntfyTopic');
+  if(!topic){flash('Enter your topic name first!');return;}
+  const btn=document.getElementById('btn-test');
+  btn.textContent='Sending...';btn.disabled=true;
+  try{
+    await fetch('https://ntfy.sh/'+topic,{
+      method:'POST',
+      headers:{'Title':'MedRevise 🌸 Test','Priority':'high','Tags':'cherry_blossom'},
+      body:'Your revision reminders are set up correctly! You will receive daily notifications at your chosen time.'
+    });
+    btn.textContent='Sent! Check ntfy app ✓';
+    setTimeout(()=>{btn.textContent='Send test notification';btn.disabled=false;},3000);
+  }catch(e){
+    btn.textContent='Failed — need internet for setup';
+    setTimeout(()=>{btn.textContent='Send test notification';btn.disabled=false;},3000);
+  }
+}
+
+// ---- Settings drawer ----
+function openSettings(){
+  const topic=localStorage.getItem('ntfyTopic')||'';
+  const time=localStorage.getItem('reminderTime')||'08:00';
+  document.getElementById('ntfy-topic').value=topic;
+  document.getElementById('reminder-time').value=time;
+  updateNtfyStatus();
+  document.getElementById('drawer').style.display='block';
+  document.getElementById('drawer-overlay').classList.add('open');
+}
+
+function closeSettings(){
+  document.getElementById('drawer').style.display='none';
+  document.getElementById('drawer-overlay').classList.remove('open');
+}
+
+function updateNtfyStatus(){
+  const topic=localStorage.getItem('ntfyTopic');
+  const time=localStorage.getItem('reminderTime')||'08:00';
+  const dot=document.getElementById('ntfy-dot');
+  const txt=document.getElementById('ntfy-status-text');
+  const testBtn=document.getElementById('btn-test');
+  if(topic){
+    dot.style.background='var(--green)';
+    txt.textContent='Active — sending to "'+topic+'" at '+formatTime(time)+' daily';
+    testBtn.style.display='block';
+  }else{
+    dot.style.background='var(--hint)';
+    txt.textContent='Not configured yet';
+    testBtn.style.display='none';
+  }
+}
+
+function saveSettings(){
+  const topic=document.getElementById('ntfy-topic').value.trim().replace(/\s+/g,'');
+  const time=document.getElementById('reminder-time').value;
+  if(!topic){
+    document.getElementById('ntfy-topic').focus();
+    document.getElementById('ntfy-topic').style.borderColor='var(--red)';
+    return;
+  }
+  document.getElementById('ntfy-topic').style.borderColor='';
+  localStorage.setItem('ntfyTopic',topic);
+  localStorage.setItem('reminderTime',time);
+  updateNtfyStatus();
+  scheduleNtfy();
+  closeSettings();
+  flash('Reminders active! Daily notification at '+formatTime(time)+' 🌸');
+}
+
+function formatTime(t){
+  const[h,m]=t.split(':').map(Number);
+  const ap=h>=12?'PM':'AM';
+  return(h%12||12)+':'+(m<10?'0'+m:m)+' '+ap;
+}
+
+// ---- Alert modal ----
+function playChime(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [[523.25,0],[659.25,.2],[783.99,.4],[523.25,.7],[659.25,.85],[783.99,1.0]].forEach(([f,t])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=f;o.type='sine';
+      g.gain.setValueAtTime(0,ctx.currentTime+t);
+      g.gain.linearRampToValueAtTime(0.5,ctx.currentTime+t+0.02);
+      g.gain.linearRampToValueAtTime(0,ctx.currentTime+t+0.22);
+      o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+0.3);
+    });
+  }catch(e){}
+}
+
+function showAlert(){
+  const overdue=topics.filter(t=>status(t)==='overdue');
+  const due=topics.filter(t=>status(t)==='today');
+  const all=[...overdue,...due];
+  if(!all.length)return;
+  document.getElementById('alert-icon').textContent=overdue.length?'⚠️':'📚';
+  document.getElementById('alert-title').textContent=overdue.length
+    ?overdue.length+' overdue + '+due.length+' due today!'
+    :due.length+' topic'+(due.length>1?'s':'')+' due for revision!';
+  document.getElementById('alert-rows').innerHTML=all.map(t=>{
+    const next=revisions(t).find(r=>!r.done);
+    const s=status(t);
+    return'<div class="alert-row">'
+      +'<div><div class="ar-name">'+t.topic+'</div>'
+      +'<div class="ar-sub">'+t.subject+(next?' • Day '+next.day+' revision':'')+'</div></div>'
+      +'<span class="ar-badge '+(s==='overdue'?'ab-ov':'ab-td')+'">'+(s==='overdue'?'Overdue':'Due Today')+'</span>'
+      +'</div>';
+  }).join('');
+  document.getElementById('alert-overlay').classList.remove('hidden');
+  playChime();
+}
+
+function dismissAlert(){document.getElementById('alert-overlay').classList.add('hidden');}
+
+// ---- Core CRUD ----
+function addTopic(){
+  const topic=document.getElementById('inp-topic').value.trim();
+  if(!topic){document.getElementById('inp-topic').focus();return;}
+  topics.unshift({id:Date.now(),subject:document.getElementById('inp-subj').value,topic,concepts:document.getElementById('inp-concepts').value.trim(),studiedDate:tod().toISOString(),revisedOn:[false,false,false,false,false]});
+  save();render();
+  document.getElementById('inp-topic').value='';
+  document.getElementById('inp-concepts').value='';
+  flash('"'+topic+'" added! Revisions: Day 1, 3, 5, 7 & 15 🌸');
+}
+
+function markRevised(id,idx){
+  const t=topics.find(x=>x.id===id);if(!t)return;
+  t.revisedOn[idx]=true;save();render();
+  flash(status(t)==='done'?'All done for "'+t.topic+'"! 💪':'Day '+REV_DAYS[idx]+' marked ✓ 🌸');
+}
+
+function deleteTopic(id){
+  if(!confirm('Delete this topic?'))return;
+  topics=topics.filter(x=>x.id!==id);save();render();
+}
+
+function save(){localStorage.setItem('medrevise_v6',JSON.stringify(topics));}
+
+function setTab(t){
+  tab=t;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  render();
+}
+
+function flash(msg){
+  const el=document.getElementById('flash');
+  document.getElementById('flash-text').textContent=msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),4000);
+}
+
+function fmt(d){return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short'});}
+
+function render(){
+  document.getElementById('hdate').textContent=tod().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+  const ws=topics.map(t=>({...t,_s:status(t)}));
+  const ct={all:topics.length,overdue:0,today:0,upcoming:0,done:0};
+  ws.forEach(t=>ct[t._s]++);
+  ['all','overdue','today','upcoming','done'].forEach(k=>document.getElementById('c-'+k).textContent=ct[k]);
+  document.getElementById('s-total').textContent=topics.length;
+  document.getElementById('s-due').textContent=ct.today+ct.overdue;
+  document.getElementById('s-done').textContent=ct.done;
+  let filtered=tab==='all'?ws:ws.filter(t=>t._s===tab);
+  document.getElementById('list-lbl').textContent={all:'All topics',overdue:'Overdue — revise now 🔴',today:'Due today 🟡',upcoming:'Upcoming 🟢',done:'Completed ✓'}[tab];
+  const list=document.getElementById('topic-list');
+  if(!filtered.length){list.innerHTML='<div class="empty"><div class="ico">🌸</div><p>No topics here.<br>Add what you studied today!</p></div>';return;}
+  list.innerHTML=filtered.map(t=>{
+    const revs=revisions(t),c=COLORS[t.subject]||'#D4537E';
+    const cls=t._s==='overdue'?'overdue':t._s==='today'?'due-today':t._s==='upcoming'?'upcoming':'';
+    const pills=revs.map(r=>'<span class="pill '+(r.done?'p-done':r.diff<0?'p-ov':r.diff===0?'p-td':'p-next')+'">Day '+r.day+(r.done?' ✓':'')+'</span>').join('');
+    const next=revs.find(r=>!r.done);
+    const badge=t._s==='overdue'?'<span class="stbadge st-ov">Overdue</span>':t._s==='today'?'<span class="stbadge st-td">Due Today</span>':'';
+    const action=next?'<button class="btn-mark" onclick="markRevised('+t.id+','+next.i+')">Mark Day '+next.day+' done</button>':'<span class="done-txt">All done ✓</span>';
+    return'<div class="card '+cls+'"><div class="ctop"><span class="sbadge" style="background:'+c+'18;color:'+c+'">'+t.subject+'</span><div class="cmeta">'+badge+'<span class="studied">'+fmt(t.studiedDate)+'</span></div></div><div class="ctopic">'+t.topic+'</div>'+(t.concepts?'<div class="cconcepts">'+t.concepts+'</div>':'')+'<div class="pills">'+pills+'</div><div class="cfoot">'+action+'<button class="btn-del" onclick="deleteTopic('+t.id+')">✕</button></div></div>';
+  }).join('');
+}
+
+// ---- Service Worker ----
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js',{scope:'/medrevise/'}).catch(e=>console.warn(e));
+}
+
+// ---- Init ----
+if(!topics.length){
+  topics=[
+    {id:1,subject:'Anatomy',topic:'Brachial Plexus',concepts:"Roots C5-T1 • Erb's palsy upper trunk • Klumpke's lower trunk • LOAF muscles",studiedDate:new Date(Date.now()-86400000*2).toISOString(),revisedOn:[true,false,false,false,false]},
+    {id:2,subject:'Physiology',topic:'Cardiac Action Potential',concepts:'Phase 0 Na+ rush • Phase 2 Ca2+ plateau • SA node auto-depolarization',studiedDate:new Date(Date.now()-86400000).toISOString(),revisedOn:[false,false,false,false,false]}
+  ];
+  save();
+}
+
+scheduleNtfy();
+render();
+setTimeout(showAlert,600);
+</script>
+</body>
+</html>
