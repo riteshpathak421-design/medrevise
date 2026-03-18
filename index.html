@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>MedRevise 🌸</title>
+<meta name="theme-color" content="#D4537E"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="MedRevise"/>
+<link rel="manifest" href="manifest.json"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --pink:#D4537E;--pink-l:#FBEAF0;--pink-d:#993556;--pink-b:#F4C0D1;
+  --green:#1D9E75;--green-l:#EAF3DE;
+  --amber:#EF9F27;--amber-l:#FAEEDA;
+  --red:#E24B4A;--red-l:#FCEBEB;
+  --blue:#185FA5;--blue-l:#E6F1FB;
+  --bg:#FAFAF9;--card:#fff;--bdr:rgba(0,0,0,0.09);
+  --txt:#1A1A1A;--sub:#6B6B6B;--hint:#ADADAD;
+  --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;min-height:100vh}
+.wrap{max-width:480px;margin:0 auto}
+.hdr{background:var(--card);border-bottom:1px solid var(--bdr);padding:calc(var(--sat)+14px) 16px 12px;position:sticky;top:0;z-index:10}
+.hrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.logo{font-family:'Playfair Display',serif;font-size:21px;font-weight:600}
+.logo em{color:var(--pink);font-style:normal}
+.hbtns{display:flex;gap:6px;align-items:center}
+.hbtn{font-size:11px;padding:5px 11px;border-radius:20px;border:1px solid var(--bdr);background:none;color:var(--sub);cursor:pointer;font-family:'DM Sans',sans-serif}
+.hdate{font-size:11px;color:var(--sub)}
+.stats{display:flex;gap:8px}
+.stat{flex:1;background:var(--bg);border-radius:10px;padding:7px;text-align:center}
+.stat .n{font-size:17px;font-weight:500}
+.stat .l{font-size:10px;color:var(--sub);margin-top:1px}
+.stat.w .n{color:var(--amber)}.stat.g .n{color:var(--green)}
+.flash{margin:8px 16px;padding:10px 14px;background:var(--pink-l);border:1px solid var(--pink-b);border-radius:12px;font-size:13px;color:#72243E;display:none;gap:8px;align-items:center}
+.flash.on{display:flex}
+.add-wrap{padding:14px 16px}
+.add-card{background:var(--card);border-radius:16px;border:1px solid var(--bdr);padding:16px}
+.form-lbl{font-size:10px;font-weight:500;color:var(--pink);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.fg label{font-size:10px;font-weight:500;color:var(--sub);text-transform:uppercase;letter-spacing:.4px}
+.fg select,.fg input,.fg textarea{background:var(--bg);border:1px solid var(--bdr);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--txt);font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none}
+.fg select:focus,.fg input:focus,.fg textarea:focus{border-color:var(--pink)}
+.fg textarea{min-height:66px;resize:none}
+.btn-pink{width:100%;background:var(--pink);color:#fff;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer}
+.btn-pink:active{background:var(--pink-d)}
+.tabs-row{padding:0 16px 6px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.tabs-row::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;font-size:12px;font-weight:500;padding:6px 14px;border-radius:20px;border:1px solid var(--bdr);background:var(--card);color:var(--sub);cursor:pointer;display:flex;align-items:center;gap:4px}
+.tab.on{background:var(--pink-l);border-color:var(--pink);color:var(--pink-d)}
+.bdg{background:var(--hint);color:#fff;border-radius:10px;font-size:10px;padding:1px 6px}
+.tab.on .bdg{background:var(--pink)}
+.list{padding:8px 16px 120px}
+.lbl{font-size:11px;font-weight:500;color:var(--hint);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.card{background:var(--card);border-radius:16px;border:1px solid var(--bdr);padding:14px 16px;margin-bottom:10px}
+.card.ov{border-left:3px solid var(--red)}.card.td{border-left:3px solid var(--amber)}.card.up{border-left:3px solid var(--green)}
+.ctop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.sbadge{font-size:10px;font-weight:500;padding:3px 10px;border-radius:20px}
+.cmeta{display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.stb{font-size:10px;font-weight:500;padding:3px 8px;border-radius:20px}
+.stb-ov{background:var(--red-l);color:#A32D2D}.stb-td{background:var(--amber-l);color:#854F0B}
+.ctopic{font-size:15px;font-weight:500;margin-bottom:4px}
+.ccon{font-size:12px;color:var(--sub);line-height:1.55;margin-bottom:10px}
+.cdate{font-size:11px;color:var(--hint)}
+.pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.pill{font-size:10px;font-weight:500;padding:3px 9px;border-radius:20px}
+.pd{background:var(--green-l);color:#3B6D11}.po{background:var(--red-l);color:#A32D2D}
+.pt{background:var(--amber-l);color:#854F0B}.pn{background:var(--bg);color:var(--hint);border:1px solid var(--bdr)}
+.cfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.cleft{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.btn-mark{font-size:12px;font-weight:500;padding:6px 14px;border-radius:20px;border:1px solid var(--pink);background:transparent;color:var(--pink);cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-ask{font-size:12px;font-weight:500;padding:6px 12px;border-radius:20px;border:1px solid var(--blue);background:var(--blue-l);color:var(--blue);cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-del{font-size:12px;padding:6px 10px;border-radius:20px;border:1px solid var(--bdr);background:transparent;color:var(--hint);cursor:pointer;font-family:'DM Sans',sans-serif}
+.done-txt{font-size:12px;font-weight:500;color:var(--green)}
+.empty{text-align:center;padding:48px 20px;color:var(--sub)}
+.empty div{font-size:32px;margin-bottom:10px}.empty p{font-size:14px;line-height:1.6}
+
+/* Full-screen panels */
+.panel{display:none;position:fixed;inset:0;background:var(--card);z-index:500;flex-direction:column;max-width:480px;left:50%;transform:translateX(-50%)}
+.panel.open{display:flex}
+.panel-hdr{background:var(--card);border-bottom:1px solid var(--bdr);padding:calc(var(--sat)+14px) 16px 12px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.btn-back{background:none;border:none;font-size:22px;color:var(--sub);cursor:pointer;line-height:1;padding:0 4px 0 0}
+.panel-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:600}
+.panel-body{flex:1;overflow-y:auto;padding:16px}
+.panel-footer{padding:12px 16px calc(var(--sab)+12px);border-top:1px solid var(--bdr);flex-shrink:0}
+
+/* Siri */
+.step{display:flex;gap:12px;margin-bottom:18px}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--pink);color:#fff;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-t{font-size:13px;font-weight:500;margin-bottom:3px}
+.step-d{font-size:12px;color:var(--sub);line-height:1.55}
+.step-d b{color:var(--txt);font-weight:500}
+.tip{background:var(--pink-l);border:1px solid var(--pink-b);border-radius:12px;padding:12px;font-size:12px;color:#72243E;line-height:1.55;margin-bottom:16px}
+
+/* AI key */
+.sec-note{background:var(--green-l);border-radius:10px;padding:10px 12px;font-size:12px;color:#085041;margin-bottom:14px;line-height:1.5}
+.key-lbl{font-size:11px;font-weight:500;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.key-input{width:100%;background:var(--bg);border:1px solid var(--bdr);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--txt);font-family:'DM Sans',sans-serif;outline:none;margin-bottom:4px}
+.key-input:focus{border-color:var(--pink)}
+.key-hint{font-size:11px;color:var(--hint);margin-bottom:16px}
+.key-hint a{color:var(--blue)}
+
+/* Chat */
+.chat-ctx{background:var(--bg);border-radius:12px;padding:10px 14px;margin-bottom:10px;flex-shrink:0}
+.chat-ctx-lbl{font-size:10px;font-weight:500;color:var(--pink);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.chat-ctx-txt{font-size:12px;color:var(--sub);line-height:1.5}
+.msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:0 16px 8px;min-height:100px}
+.msg{max-width:88%;padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.55;word-wrap:break-word}
+.msg.u{background:var(--pink);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.msg.a{background:var(--bg);color:var(--txt);align-self:flex-start;border-bottom-left-radius:4px;border:1px solid var(--bdr)}
+.thinking{color:var(--hint);font-style:italic}
+.quick-btns{display:flex;gap:6px;overflow-x:auto;padding:8px 16px;scrollbar-width:none;flex-shrink:0}
+.quick-btns::-webkit-scrollbar{display:none}
+.qbtn{flex-shrink:0;font-size:11px;padding:6px 12px;border-radius:20px;border:1px solid var(--pink-b);background:var(--pink-l);color:var(--pink-d);cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.chat-inp-row{display:flex;gap:8px;padding:8px 16px calc(var(--sab)+8px);flex-shrink:0;border-top:1px solid var(--bdr)}
+.chat-inp{flex:1;background:var(--bg);border:1px solid var(--bdr);border-radius:20px;padding:10px 16px;font-size:13px;color:var(--txt);font-family:'DM Sans',sans-serif;outline:none}
+.chat-inp:focus{border-color:var(--pink)}
+.btn-send{background:var(--pink);color:#fff;border:none;border-radius:50%;width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+
+/* Alert */
+.alert-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;align-items:flex-end;justify-content:center}
+.alert-bg.on{display:flex}
+.alert-box{background:var(--card);border-radius:24px 24px 0 0;padding:20px 20px calc(var(--sab)+20px);width:100%;max-width:480px}
+.alert-icon{font-size:32px;text-align:center;margin-bottom:6px}
+.alert-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:600;text-align:center;margin-bottom:4px}
+.alert-sub{font-size:13px;color:var(--sub);text-align:center;margin-bottom:14px}
+.alert-rows{display:flex;flex-direction:column;gap:7px;max-height:200px;overflow-y:auto;margin-bottom:14px}
+.ar{display:flex;justify-content:space-between;align-items:center;background:var(--bg);border-radius:12px;padding:10px 14px}
+.ar-name{font-size:13px;font-weight:500}
+.ar-info{font-size:11px;color:var(--sub);margin-top:2px}
+.ar-badge{font-size:10px;font-weight:500;padding:3px 9px;border-radius:20px;flex-shrink:0}
+.aro{background:var(--red-l);color:#A32D2D}.art{background:var(--amber-l);color:#854F0B}
+</style>
+</head>
+<body>
+
+<!-- ALERT -->
+<div class="alert-bg" id="alert-bg">
+  <div class="alert-box">
+    <div class="alert-icon" id="al-icon">📚</div>
+    <div class="alert-title" id="al-title">Topics due today!</div>
+    <div class="alert-sub">Let's get these done 💪</div>
+    <div class="alert-rows" id="al-rows"></div>
+    <button class="btn-pink" id="alert-close-btn">Let's revise! 🌸</button>
+  </div>
+</div>
+
+<!-- SIRI PANEL -->
+<div class="panel" id="siri-panel">
+  <div class="panel-hdr">
+    <button class="btn-back" id="siri-back">←</button>
+    <div class="panel-title">⏰ Set up Siri reminder</div>
+  </div>
+  <div class="panel-body">
+    <div class="tip"><b>How it works:</b> iPhone's Shortcuts app runs a daily automation at any time you set — full sound, lock screen, works offline. No extra apps needed!</div>
+    <div class="step"><div class="step-num">1</div><div><div class="step-t">Open the Shortcuts app</div><div class="step-d">Already on your iPhone. Search <b>Shortcuts</b> in Spotlight if you can't find it.</div></div></div>
+    <div class="step"><div class="step-num">2</div><div><div class="step-t">Tap "Automation" → "New Automation"</div><div class="step-d">Tap the <b>Automation</b> tab at the bottom, then the <b>+</b> button at top right.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div><div class="step-t">Choose "Time of Day"</div><div class="step-d">Set your time e.g. <b>8:00 AM</b> → Repeat: <b>Daily</b> → tap Next.</div></div></div>
+    <div class="step"><div class="step-num">4</div><div><div class="step-t">Add action → "Show Notification"</div><div class="step-d">Tap <b>Add Action</b> → search <b>notification</b> → pick <b>Show Notification</b>. Set text to: <b>Time to revise! Open MedRevise 🌸</b></div></div></div>
+    <div class="step"><div class="step-num">5</div><div><div class="step-t">Turn OFF "Ask Before Running"</div><div class="step-d">Tap <b>Next</b> → toggle <b>Ask Before Running</b> to OFF → tap <b>Done</b>.</div></div></div>
+    <div class="step"><div class="step-num">6</div><div><div class="step-t">Done! 🎉</div><div class="step-d">Every day at your time the iPhone rings. Tap notification → open MedRevise → see what's due!</div></div></div>
+  </div>
+</div>
+
+<!-- AI KEY PANEL -->
+<div class="panel" id="ai-panel">
+  <div class="panel-hdr">
+    <button class="btn-back" id="ai-back">←</button>
+    <div class="panel-title">✨ Groq AI setup</div>
+  </div>
+  <div class="panel-body">
+    <div class="sec-note">🔒 Your API key is saved only on this phone. Never uploaded to GitHub or anywhere else.</div>
+    <div class="key-lbl">Groq API key</div>
+    <input type="password" class="key-input" id="groq-key" placeholder="gsk_..."/>
+    <div class="key-hint">Get free key at <a href="https://console.groq.com" target="_blank">console.groq.com</a> → Sign up → API Keys → Create key</div>
+    <div class="key-lbl">Your name (optional)</div>
+    <input type="text" class="key-input" id="user-name" placeholder="e.g. Ritesh"/>
+    <div class="key-hint">Used to personalise AI responses</div>
+  </div>
+  <div class="panel-footer">
+    <button class="btn-pink" id="save-key-btn">Save & activate AI 🌸</button>
+  </div>
+</div>
+
+<!-- CHAT PANEL -->
+<div class="panel" id="chat-panel">
+  <div class="panel-hdr">
+    <button class="btn-back" id="chat-back">←</button>
+    <div>
+      <div class="panel-title" id="chat-title">Ask AI</div>
+      <div style="font-size:11px;color:var(--sub);margin-top:1px">Groq • Llama 3.3 70B • Free</div>
+    </div>
+  </div>
+  <div style="padding:12px 16px 0;flex-shrink:0">
+    <div class="chat-ctx">
+      <div class="chat-ctx-lbl">Topic loaded</div>
+      <div class="chat-ctx-txt" id="chat-ctx"></div>
+    </div>
+  </div>
+  <div class="msgs" id="msgs"></div>
+  <div class="quick-btns">
+    <button class="qbtn" data-q="Explain this topic in simple terms for MBBS">Explain simply</button>
+    <button class="qbtn" data-q="Give me 5 high yield MCQs with answers for MBBS exam">5 MCQs</button>
+    <button class="qbtn" data-q="Give me an easy mnemonic to remember the key points">Mnemonic</button>
+    <button class="qbtn" data-q="What are the most important exam points from this topic?">Exam points</button>
+    <button class="qbtn" data-q="What clinical conditions are associated with this topic?">Clinical cases</button>
+  </div>
+  <div class="chat-inp-row">
+    <input class="chat-inp" id="chat-inp" placeholder="Ask anything about this topic..."/>
+    <button class="btn-send" id="send-btn">↑</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="wrap">
+  <div class="hdr">
+    <div class="hrow">
+      <div class="logo">Med<em>Revise</em> 🌸</div>
+      <div class="hbtns">
+        <span class="hdate" id="hdate"></span>
+        <button class="hbtn" id="siri-btn">⏰ Siri</button>
+        <button class="hbtn" id="ai-btn">✨ AI</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n" id="st">0</div><div class="l">Topics</div></div>
+      <div class="stat w"><div class="n" id="sd">0</div><div class="l">Due Today</div></div>
+      <div class="stat g"><div class="n" id="sk">0</div><div class="l">Completed</div></div>
+    </div>
+  </div>
+  <div class="flash" id="flash"><span>💗</span><span id="flash-txt"></span></div>
+  <div class="add-wrap">
+    <div class="add-card">
+      <div class="form-lbl">+ Topic studied today</div>
+      <div class="row2">
+        <div class="fg" style="margin-bottom:0">
+          <label>Subject</label>
+          <select id="i-subj">
+            <option>Anatomy</option><option>Physiology</option><option>Biochemistry</option>
+            <option>Pathology</option><option>Pharmacology</option><option>Microbiology</option>
+            <option>Medicine</option><option>Surgery</option><option>Obs &amp; Gynae</option>
+            <option>Pediatrics</option><option>PSM</option><option>ENT</option>
+            <option>Ophthalmology</option><option>Other</option>
+          </select>
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Topic name</label>
+          <input id="i-topic" placeholder="e.g. Brachial plexus"/>
+        </div>
+      </div>
+      <div style="height:10px"></div>
+      <div class="fg">
+        <label>Key concepts</label>
+        <textarea id="i-con" placeholder="e.g. Roots C5-T1 • Erb's palsy • LOAF muscles..."></textarea>
+      </div>
+      <button class="btn-pink" id="add-btn">Add to revision schedule 🌸</button>
+    </div>
+  </div>
+  <div class="tabs-row" id="tabs-row">
+    <div class="tab on" data-tab="all">All <span class="bdg" id="c-all">0</span></div>
+    <div class="tab" data-tab="overdue">Overdue <span class="bdg" id="c-overdue">0</span></div>
+    <div class="tab" data-tab="today">Today <span class="bdg" id="c-today">0</span></div>
+    <div class="tab" data-tab="upcoming">Upcoming <span class="bdg" id="c-upcoming">0</span></div>
+    <div class="tab" data-tab="done">Done <span class="bdg" id="c-done">0</span></div>
+  </div>
+  <div class="list">
+    <div class="lbl" id="list-lbl">All topics</div>
+    <div id="topic-list"></div>
+  </div>
+</div>
+
+<script>
+const DAYS=[1,3,5,7,15];
+const COL={'Anatomy':'#D4537E','Physiology':'#534AB7','Biochemistry':'#0F6E56','Pathology':'#993C1D','Pharmacology':'#185FA5','Microbiology':'#3B6D11','Medicine':'#BA7517','Surgery':'#A32D2D','Obs & Gynae':'#72243E','Pediatrics':'#0C447C','PSM':'#3C3489','ENT':'#854F0B','Ophthalmology':'#1D9E75','Other':'#5F5E5A'};
+let topics=JSON.parse(localStorage.getItem('mr9')||'[]');
+let curTab='all';
+let chatTopic=null;
+let chatHist=[];
+
+function tod(){const d=new Date();d.setHours(0,0,0,0);return d;}
+function dff(a,b){return Math.floor((b-a)/86400000);}
+function revs(t){
+  const s=new Date(t.sd);s.setHours(0,0,0,0);
+  return DAYS.map((d,i)=>{const due=new Date(s);due.setDate(due.getDate()+d);return{day:d,due,diff:dff(tod(),due),done:!!(t.rv&&t.rv[i]),i};});
+}
+function stat(t){const p=revs(t).filter(r=>!r.done);if(!p.length)return'done';if(p[0].diff<0)return'overdue';if(p[0].diff===0)return'today';return'upcoming';}
+function save(){localStorage.setItem('mr9',JSON.stringify(topics));}
+function fmt(d){return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short'});}
+
+function flash(msg){
+  const el=document.getElementById('flash');
+  document.getElementById('flash-txt').textContent=msg;
+  el.classList.add('on');
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>el.classList.remove('on'),4000);
+}
+
+function openPanel(id){document.getElementById(id).classList.add('open');document.getElementById(id).style.display='flex';}
+function closePanel(id){document.getElementById(id).classList.remove('open');document.getElementById(id).style.display='none';}
+
+// Header buttons
+document.getElementById('siri-btn').addEventListener('click',()=>openPanel('siri-panel'));
+document.getElementById('siri-back').addEventListener('click',()=>closePanel('siri-panel'));
+document.getElementById('ai-back').addEventListener('click',()=>closePanel('ai-panel'));
+document.getElementById('chat-back').addEventListener('click',()=>closePanel('chat-panel'));
+document.getElementById('alert-close-btn').addEventListener('click',()=>document.getElementById('alert-bg').classList.remove('on'));
+
+document.getElementById('ai-btn').addEventListener('click',()=>{
+  document.getElementById('groq-key').value=localStorage.getItem('groqKey')||'';
+  document.getElementById('user-name').value=localStorage.getItem('userName')||'';
+  openPanel('ai-panel');
+});
+
+document.getElementById('save-key-btn').addEventListener('click',()=>{
+  const k=document.getElementById('groq-key').value.trim();
+  const n=document.getElementById('user-name').value.trim();
+  if(!k||!k.startsWith('gsk_')){
+    document.getElementById('groq-key').style.borderColor='var(--red)';
+    flash('Key must start with gsk_ — get it free from console.groq.com');
+    return;
+  }
+  document.getElementById('groq-key').style.borderColor='';
+  localStorage.setItem('groqKey',k);
+  if(n)localStorage.setItem('userName',n);
+  closePanel('ai-panel');
+  flash('Groq AI ready! Tap ✨ Ask AI on any topic card 🌸');
+  document.getElementById('ai-btn').textContent='✨ AI ✓';
+});
+
+// Add topic
+document.getElementById('add-btn').addEventListener('click',()=>{
+  const topic=document.getElementById('i-topic').value.trim();
+  if(!topic){document.getElementById('i-topic').focus();return;}
+  topics.unshift({id:Date.now(),subj:document.getElementById('i-subj').value,topic,con:document.getElementById('i-con').value.trim(),sd:tod().toISOString(),rv:[false,false,false,false,false]});
+  save();render();
+  document.getElementById('i-topic').value='';
+  document.getElementById('i-con').value='';
+  flash('"'+topic+'" added! Revisions: Day 1,3,5,7,15 🌸');
+});
+
+// Tabs
+document.getElementById('tabs-row').addEventListener('click',function(e){
+  const t=e.target.closest('.tab');
+  if(!t)return;
+  curTab=t.dataset.tab;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');
+  render();
+});
+
+// Card actions via delegation
+document.getElementById('topic-list').addEventListener('click',function(e){
+  const btn=e.target.closest('[data-action]');
+  if(!btn)return;
+  const action=btn.dataset.action;
+  const id=Number(btn.dataset.id);
+  if(action==='mark'){
+    const idx=Number(btn.dataset.idx);
+    const t=topics.find(x=>x.id===id);
+    if(!t)return;
+    t.rv[idx]=true;save();render();
+    flash(stat(t)==='done'?'All done for "'+t.topic+'"! 💪':'Day '+DAYS[idx]+' marked ✓ 🌸');
+  } else if(action==='chat'){
+    const t=topics.find(x=>x.id===id);
+    if(!t)return;
+    chatTopic=t;chatHist=[];
+    document.getElementById('chat-title').textContent=t.topic;
+    document.getElementById('chat-ctx').textContent='Subject: '+t.subj+(t.con?' | '+t.con:'');
+    document.getElementById('msgs').innerHTML='';
+    document.getElementById('chat-inp').value='';
+    const key=localStorage.getItem('groqKey');
+    if(!key){addMsg('a','Please set up your Groq key first — tap <b>✨ AI</b> at the top of the main screen.');}
+    else{addMsg('a','Hi! Ready to help you revise <b>'+t.topic+'</b> 🌸 Use the buttons below or ask anything!');}
+    openPanel('chat-panel');
+    setTimeout(()=>document.getElementById('chat-inp').focus(),300);
+  } else if(action==='del'){
+    if(!confirm('Delete this topic?'))return;
+    topics=topics.filter(x=>x.id!==id);save();render();
+  }
+});
+
+// Chat
+function addMsg(role,html){
+  const d=document.createElement('div');
+  d.className='msg '+role;
+  d.innerHTML=html;
+  const box=document.getElementById('msgs');
+  box.appendChild(d);
+  box.scrollTop=box.scrollHeight;
+  return d;
+}
+
+async function sendMsg(text){
+  text=text.trim();if(!text)return;
+  const key=localStorage.getItem('groqKey');
+  if(!key){closePanel('chat-panel');openPanel('ai-panel');return;}
+  addMsg('u',text);
+  chatHist.push({role:'user',content:text});
+  const thinking=addMsg('a','<span class="thinking">Thinking...</span>');
+  const t=chatTopic;
+  const name=localStorage.getItem('userName')||'';
+  const sys='You are a helpful MBBS medical tutor'+(name?' helping '+name:'')+'. Student is revising: '+t.subj+' — '+t.topic+(t.con?'. Key points: '+t.con:'')+'. Give concise, exam-focused answers. Use bullet points. MBBS level.';
+  try{
+    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:sys},...chatHist],temperature:0.7,max_tokens:800})
+    });
+    const data=await r.json();
+    if(data.error){thinking.innerHTML='Error: '+data.error.message;return;}
+    const reply=data.choices?.[0]?.message?.content||'No response.';
+    thinking.innerHTML=reply.replace(/\*\*(.*?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
+    chatHist.push({role:'assistant',content:reply});
+    document.getElementById('msgs').scrollTop=document.getElementById('msgs').scrollHeight;
+  }catch(e){thinking.innerHTML='Network error — check your internet connection.';}
+}
+
+document.querySelector('.quick-btns').addEventListener('click',function(e){
+  const btn=e.target.closest('.qbtn');
+  if(btn&&btn.dataset.q)sendMsg(btn.dataset.q);
+});
+document.getElementById('send-btn').addEventListener('click',()=>{
+  const inp=document.getElementById('chat-inp');
+  sendMsg(inp.value);inp.value='';
+});
+document.getElementById('chat-inp').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){const inp=document.getElementById('chat-inp');sendMsg(inp.value);inp.value='';}
+});
+
+// Alert + chime
+function playChime(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [[523.25,0],[659.25,.2],[783.99,.4],[523.25,.7],[659.25,.85],[783.99,1.0]].forEach(([f,s])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type='sine';
+      g.gain.setValueAtTime(0,ctx.currentTime+s);g.gain.linearRampToValueAtTime(.45,ctx.currentTime+s+.02);g.gain.linearRampToValueAtTime(0,ctx.currentTime+s+.22);
+      o.start(ctx.currentTime+s);o.stop(ctx.currentTime+s+.3);
+    });
+  }catch(e){}
+}
+
+function showAlert(){
+  const ov=topics.filter(t=>stat(t)==='overdue');
+  const due=topics.filter(t=>stat(t)==='today');
+  const all=[...ov,...due];if(!all.length)return;
+  document.getElementById('al-icon').textContent=ov.length?'⚠️':'📚';
+  document.getElementById('al-title').textContent=ov.length?(ov.length+' overdue + '+due.length+' due today!'):(due.length+' topic'+(due.length>1?'s':'')+' due today!');
+  document.getElementById('al-rows').innerHTML=all.map(t=>{
+    const nx=revs(t).find(r=>!r.done);const s=stat(t);
+    return'<div class="ar"><div><div class="ar-name">'+t.topic+'</div><div class="ar-info">'+t.subj+(nx?' • Day '+nx.day:'')+'</div></div><span class="ar-badge '+(s==='overdue'?'aro':'art')+'">'+(s==='overdue'?'Overdue':'Due Today')+'</span></div>';
+  }).join('');
+  document.getElementById('alert-bg').classList.add('on');
+  playChime();
+}
+
+// Render
+function render(){
+  document.getElementById('hdate').textContent=tod().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+  const ws=topics.map(t=>({...t,_s:stat(t)}));
+  const ct={all:topics.length,overdue:0,today:0,upcoming:0,done:0};
+  ws.forEach(t=>ct[t._s]++);
+  document.getElementById('c-all').textContent=ct.all;
+  document.getElementById('c-overdue').textContent=ct.overdue;
+  document.getElementById('c-today').textContent=ct.today;
+  document.getElementById('c-upcoming').textContent=ct.upcoming;
+  document.getElementById('c-done').textContent=ct.done;
+  document.getElementById('st').textContent=topics.length;
+  document.getElementById('sd').textContent=ct.today+ct.overdue;
+  document.getElementById('sk').textContent=ct.done;
+  document.getElementById('list-lbl').textContent={all:'All topics',overdue:'Overdue 🔴',today:'Due today 🟡',upcoming:'Upcoming 🟢',done:'Completed ✓'}[curTab];
+  const filtered=curTab==='all'?ws:ws.filter(t=>t._s===curTab);
+  const list=document.getElementById('topic-list');
+  if(!filtered.length){list.innerHTML='<div class="empty"><div>🌸</div><p>No topics here.<br>Add what you studied today!</p></div>';return;}
+  list.innerHTML=filtered.map(t=>{
+    const rv=revs(t),c=COL[t.subj]||'#D4537E';
+    const cls=t._s==='overdue'?'ov':t._s==='today'?'td':t._s==='upcoming'?'up':'';
+    const pills=rv.map(r=>'<span class="pill '+(r.done?'pd':r.diff<0?'po':r.diff===0?'pt':'pn')+'">Day '+r.day+(r.done?' ✓':'')+'</span>').join('');
+    const nx=rv.find(r=>!r.done);
+    const badge=t._s==='overdue'?'<span class="stb stb-ov">Overdue</span>':t._s==='today'?'<span class="stb stb-td">Due Today</span>':'';
+    const markBtn=nx?'<button class="btn-mark" data-action="mark" data-id="'+t.id+'" data-idx="'+nx.i+'">Mark Day '+nx.day+'</button>':'<span class="done-txt">All done ✓</span>';
+    return '<div class="card '+cls+'">'
+      +'<div class="ctop"><span class="sbadge" style="background:'+c+'18;color:'+c+'">'+t.subj+'</span>'
+      +'<div class="cmeta">'+badge+'<span class="cdate">'+fmt(t.sd)+'</span></div></div>'
+      +'<div class="ctopic">'+t.topic+'</div>'
+      +(t.con?'<div class="ccon">'+t.con+'</div>':'')
+      +'<div class="pills">'+pills+'</div>'
+      +'<div class="cfoot"><div class="cleft">'+markBtn
+      +'<button class="btn-ask" data-action="chat" data-id="'+t.id+'">✨ Ask AI</button></div>'
+      +'<button class="btn-del" data-action="del" data-id="'+t.id+'">✕</button>'
+      +'</div></div>';
+  }).join('');
+}
+
+// Service worker
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js',{scope:'/medrevise/'}).catch(()=>{});}
+
+// Init
+if(!topics.length){
+  topics=[
+    {id:1,subj:'Anatomy',topic:'Brachial Plexus',con:"Roots C5-T1 • Erb's palsy upper trunk • Klumpke's lower trunk • LOAF muscles",sd:new Date(Date.now()-86400000*2).toISOString(),rv:[true,false,false,false,false]},
+    {id:2,subj:'Physiology',topic:'Cardiac Action Potential',con:'Phase 0 Na+ rush • Phase 2 Ca2+ plateau • SA node auto-depolarization',sd:new Date(Date.now()-86400000).toISOString(),rv:[false,false,false,false,false]}
+  ];
+  save();
+}
+if(localStorage.getItem('groqKey'))document.getElementById('ai-btn').textContent='✨ AI ✓';
+render();
+setTimeout(showAlert,600);
+</script>
+</body>
+</html>
