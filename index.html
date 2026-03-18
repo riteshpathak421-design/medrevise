@@ -256,23 +256,46 @@
     <div class="sheet">
       <div class="sheet-handle"></div>
       <div class="sheet-header">
-        <div class="sheet-title">🔑 Groq API key</div>
-        <div class="sheet-sub">Free • No card • Saved only on your device</div>
+        <div class="sheet-title">✨ AI settings</div>
+        <div class="sheet-sub">Add keys for any AI — all free, all stored only on your phone</div>
       </div>
       <div class="sheet-body">
-        <div class="security-note">🔒 Your API key is stored only in your phone's local storage. It is never sent to GitHub or anywhere else. Only Gemini's servers see it when you chat.</div>
+        <div class="security-note">🔒 Keys are saved only on your phone. Never uploaded to GitHub or anywhere else.</div>
+
         <div class="key-row">
-          <div class="key-label">Gemini API key</div>
-          <input type="password" class="key-input" id="groq-key" placeholder="Paste your key: gsk_..."/>
-          <div class="key-hint">Get free key at console.groq.com → Sign up → API Keys → Create</div>
+          <div class="key-label" style="display:flex;justify-content:space-between;align-items:center">
+            <span>Groq <span style="background:#EAF3DE;color:#3B6D11;font-size:10px;padding:2px 7px;border-radius:10px;margin-left:4px">Recommended • Free</span></span>
+            <a href="https://console.groq.com" target="_blank" style="font-size:10px;color:#185FA5">Get key ↗</a>
+          </div>
+          <input type="password" class="key-input" id="groq-key" placeholder="gsk_..."/>
+          <div class="key-hint">console.groq.com → API Keys → Create • Llama 3.3 70B model</div>
         </div>
+
+        <div class="key-row">
+          <div class="key-label" style="display:flex;justify-content:space-between;align-items:center">
+            <span>Gemini <span style="background:#FAEEDA;color:#854F0B;font-size:10px;padding:2px 7px;border-radius:10px;margin-left:4px">Free tier</span></span>
+            <a href="https://aistudio.google.com" target="_blank" style="font-size:10px;color:#185FA5">Get key ↗</a>
+          </div>
+          <input type="password" class="key-input" id="gemini-key-input" placeholder="AIzaSy..."/>
+          <div class="key-hint">aistudio.google.com → Get API Key • Gemini 2.0 Flash</div>
+        </div>
+
+        <div class="key-row">
+          <div class="key-label" style="display:flex;justify-content:space-between;align-items:center">
+            <span>OpenRouter <span style="background:#E6F1FB;color:#185FA5;font-size:10px;padding:2px 7px;border-radius:10px;margin-left:4px">Multi-model</span></span>
+            <a href="https://openrouter.ai" target="_blank" style="font-size:10px;color:#185FA5">Get key ↗</a>
+          </div>
+          <input type="password" class="key-input" id="openrouter-key-input" placeholder="sk-or-v1-..."/>
+          <div class="key-hint">openrouter.ai → Keys → Create • Access to many models</div>
+        </div>
+
         <div class="key-row" style="margin-top:4px">
           <div class="key-label">Your name (optional)</div>
           <input type="text" class="key-input" id="user-name" placeholder="e.g. Ritesh — for personalised responses"/>
         </div>
       </div>
       <div class="sheet-footer">
-        <button class="btn-primary" onclick="saveApiKey()">Save & start chatting 🌸</button>
+        <button class="btn-primary" onclick="saveApiKey()">Save keys 🌸</button>
         <button class="btn-secondary" onclick="closeOverlay('key-overlay')">Cancel</button>
       </div>
     </div>
@@ -284,11 +307,11 @@
       <div class="sheet-handle"></div>
       <div class="sheet-header" style="padding-bottom:10px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start">
-          <div>
+          <div style="flex:1">
             <div class="sheet-title" id="chat-topic-title">Ask AI</div>
-            <div class="sheet-sub" id="chat-topic-sub"></div>
+            <div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap" id="ai-switcher"></div>
           </div>
-          <button onclick="closeOverlay('chat-overlay')" style="background:none;border:none;font-size:20px;color:var(--hint);cursor:pointer;padding:0">✕</button>
+          <button onclick="closeOverlay('chat-overlay')" style="background:none;border:none;font-size:20px;color:var(--hint);cursor:pointer;padding:0;margin-left:8px">✕</button>
         </div>
       </div>
       <div style="padding:10px 20px 0;flex-shrink:0">
@@ -410,34 +433,53 @@ function openOverlay(id){document.getElementById(id).classList.remove('hidden');
 function closeOverlay(id){document.getElementById(id).classList.add('hidden');}
 
 function openAISetup(){
-  const key=localStorage.getItem('groqKey');
-  if(key){
-    flash('AI already set up! Tap "Ask AI" on any topic card 🌸');
-  } else {
-    openOverlay('key-overlay');
-  }
+  const groq=localStorage.getItem('groqKey')||'';
+  const gemini=localStorage.getItem('geminiKey')||'';
+  const openrouter=localStorage.getItem('openrouterKey')||'';
+  const name=localStorage.getItem('userName')||'';
+  document.getElementById('groq-key').value=groq;
+  document.getElementById('gemini-key-input').value=gemini;
+  document.getElementById('openrouter-key-input').value=openrouter;
+  document.getElementById('user-name').value=name;
+  openOverlay('key-overlay');
 }
 
 function saveApiKey(){
-  const key=document.getElementById('groq-key').value.trim();
+  const groq=document.getElementById('groq-key').value.trim();
+  const gemini=document.getElementById('gemini-key-input').value.trim();
+  const openrouter=document.getElementById('openrouter-key-input').value.trim();
   const name=document.getElementById('user-name').value.trim();
-  if(!key||key.length<10){
-    document.getElementById('groq-key').style.borderColor='var(--red)';
-    flash('Please enter a valid OpenRouter key');
-    return;
+  if(!groq&&!gemini&&!openrouter){flash('Please enter at least one API key!');return;}
+  if(groq) localStorage.setItem('groqKey',groq);
+  if(gemini) localStorage.setItem('geminiKey',gemini);
+  if(openrouter) localStorage.setItem('openrouterKey',openrouter);
+  if(name) localStorage.setItem('userName',name);
+  if(!localStorage.getItem('preferredAI')){
+    if(groq) localStorage.setItem('preferredAI','groq');
+    else if(gemini) localStorage.setItem('preferredAI','gemini');
+    else localStorage.setItem('preferredAI','openrouter');
   }
-  document.getElementById('groq-key').style.borderColor='';
-  localStorage.setItem('groqKey',key);
-  if(name)localStorage.setItem('userName',name);
   document.getElementById('ai-btn').classList.add('active-btn');
-  document.getElementById('ai-btn').textContent='✨ AI ✓';
+  const count=[groq,gemini,openrouter].filter(Boolean).length;
+  document.getElementById('ai-btn').textContent='✨ AI ('+count+')';
   closeOverlay('key-overlay');
-  flash('Groq AI ready! 🌸 Tap "Ask AI" on any topic card 🌸');
+  flash(count+' AI'+(count>1?'s':'')+' ready! Tap Ask AI on any topic 🌸');
+}
+
+function getActiveAI(){
+  const pref=localStorage.getItem('preferredAI')||'groq';
+  const map={
+    groq:{key:localStorage.getItem('groqKey'),label:'Groq • Llama 3.3',url:'https://api.groq.com/openai/v1/chat/completions',model:'llama-3.3-70b-versatile',type:'openai',id:'groq'},
+    gemini:{key:localStorage.getItem('geminiKey'),label:'Gemini 2.0 Flash',url:'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',model:'gemini-2.0-flash',type:'gemini',id:'gemini'},
+    openrouter:{key:localStorage.getItem('openrouterKey'),label:'OpenRouter',url:'https://openrouter.ai/api/v1/chat/completions',model:'meta-llama/llama-3.3-70b-instruct:free',type:'openai',id:'openrouter'}
+  };
+  if(map[pref]&&map[pref].key) return map[pref];
+  for(const k of ['groq','gemini','openrouter']){if(map[k].key) return map[k];}
+  return map.groq;
 }
 
 // ---- AI Chat ----
 function openChat(topicId){
-  const key=localStorage.getItem('groqKey');
   const t=topics.find(x=>x.id===topicId);
   if(!t)return;
 
@@ -445,15 +487,39 @@ function openChat(topicId){
   chatHistory=[];
 
   document.getElementById('chat-topic-title').textContent=t.topic;
-  document.getElementById('chat-topic-sub').textContent=t.subject+' • Groq AI (Llama 3)';
+  const activeAI=getActiveAI();
+  document.getElementById('chat-topic-sub').textContent=t.subject+' • '+activeAI.label;
   document.getElementById('chat-context-text').textContent=
     'Subject: '+t.subject+' | Topic: '+t.topic+(t.concepts?' | Key points: '+t.concepts:'');
   document.getElementById('chat-messages').innerHTML='';
   document.getElementById('chat-input').value='';
 
-  if(!key){
+  // build AI switcher buttons
+  const switcher=document.getElementById('ai-switcher');
+  switcher.innerHTML='';
+  const aiMap={groq:{label:'Groq',key:'groqKey'},gemini:{label:'Gemini',key:'geminiKey'},openrouter:{label:'OpenRouter',key:'openrouterKey'}};
+  const active=getActiveAI();
+  Object.entries(aiMap).forEach(([id,info])=>{
+    if(!localStorage.getItem(info.key)) return;
+    const btn=document.createElement('button');
+    btn.className='ai-sel-btn'+(active.id===id?' active':'');
+    btn.textContent=info.label;
+    btn.onclick=()=>{
+      localStorage.setItem('preferredAI',id);
+      document.querySelectorAll('.ai-sel-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const newAI=getActiveAI();
+      document.getElementById('chat-topic-title').textContent=currentChatTopic.topic;
+      chatHistory=[];
+      document.getElementById('chat-messages').innerHTML='';
+      addMessage('ai','Switched to <b>'+newAI.label+'</b>! Ask me anything about '+currentChatTopic.topic+' 🌸');
+    };
+    switcher.appendChild(btn);
+  });
+
+  if(!getActiveAI().key){
     document.getElementById('chat-messages').innerHTML=
-      '<div class="no-key-msg">✨ <b>Set up Gemini AI first!</b><br>Tap the <b>✨ AI</b> button at the top to add your free Gemini API key from aistudio.google.com</div>';
+      '<div class="no-key-msg">✨ <b>Set up AI first!</b><br>Tap the <b>✨ AI</b> button at the top to add a free API key (Groq recommended).</div>';
   } else {
     addMessage('ai','Hi! I\'m ready to help you revise <b>'+t.topic+'</b>. Use the quick buttons below or ask me anything! 🌸');
   }
@@ -482,13 +548,13 @@ async function sendChat(){
 function sendQuick(text){sendMessage(text);}
 
 async function sendMessage(userText){
-  const key=localStorage.getItem('groqKey');
-  if(!key){openOverlay('key-overlay');return;}
+  const ai=getActiveAI();
+  if(!ai.key){openOverlay('key-overlay');return;}
 
   addMessage('user',userText);
   chatHistory.push({role:'user',parts:[{text:userText}]});
 
-  const thinking=addMessage('ai','<span class="thinking">Thinking...</span>');
+  const thinking=addMessage('ai','<span class="thinking">Thinking with '+ai.label+'...</span>');
 
   const t=currentChatTopic;
   const userName=localStorage.getItem('userName')||'';
@@ -497,28 +563,31 @@ async function sendMessage(userText){
     (t.concepts?', Key concepts: '+t.concepts:'')+
     '. Give clear, concise, exam-focused answers. Use bullet points for lists. Keep answers focused and relevant to MBBS exams.';
 
-  const groqBody={
-    model:'llama-3.3-70b-versatile',
-    messages:[
-      {role:'system',content:systemContext},
-      ...chatHistory.map(m=>({role:m.role==='model'?'assistant':'user',content:m.parts[0].text}))
-    ],
-    temperature:0.7,
-    max_tokens:1024
-  };
+  const msgs=chatHistory.map(m=>({role:m.role==='model'?'assistant':'user',content:m.parts[0].text}));
 
   try{
-    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body:JSON.stringify(groqBody)
-    });
-    const data=await res.json();
-    if(data.error){
-      thinking.innerHTML='Error: '+data.error.message+' — check your API key in ✨ AI settings.';
-      return;
+    let res,data,reply;
+    if(ai.type==='gemini'){
+      res=await fetch(ai.url+'?key='+ai.key,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({system_instruction:{parts:[{text:systemContext}]},contents:chatHistory})
+      });
+      data=await res.json();
+      if(data.error){thinking.innerHTML='Error: '+data.error.message+' — check your Gemini key in ✨ AI settings.';return;}
+      reply=data.candidates?.[0]?.content?.parts?.[0]?.text||'No response received.';
+    } else {
+      const headers={'Content-Type':'application/json','Authorization':'Bearer '+ai.key};
+      if(ai.id==='openrouter'){headers['HTTP-Referer']='https://riteshpathak421-design.github.io/medrevise/';headers['X-Title']='MedRevise';}
+      res=await fetch(ai.url,{
+        method:'POST',
+        headers,
+        body:JSON.stringify({model:ai.model,messages:[{role:'system',content:systemContext},...msgs],temperature:0.7,max_tokens:1024})
+      });
+      data=await res.json();
+      if(data.error){thinking.innerHTML='Error: '+data.error.message+' — check your '+ai.label+' key in ✨ AI settings.';return;}
+      reply=data.choices?.[0]?.message?.content||'No response received.';
     }
-    const reply=data.choices?.[0]?.message?.content||'No response received.';
     const formatted=reply
       .replace(/\*\*(.*?)\*\*/g,'<b>$1</b>')
       .replace(/\*(.*?)\*/g,'<i>$1</i>')
@@ -643,9 +712,11 @@ if(!topics.length){
   save();
 }
 
-if(localStorage.getItem('groqKey')){
+const _anyKey=localStorage.getItem('groqKey')||localStorage.getItem('geminiKey')||localStorage.getItem('openrouterKey');
+if(_anyKey){
   document.getElementById('ai-btn').classList.add('active-btn');
-  document.getElementById('ai-btn').textContent='✨ AI ✓';
+  const _cnt=['groqKey','geminiKey','openrouterKey'].filter(k=>localStorage.getItem(k)).length;
+  document.getElementById('ai-btn').textContent='✨ AI ('+_cnt+')';
 }
 
 render();
