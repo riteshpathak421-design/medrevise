@@ -256,15 +256,15 @@
     <div class="sheet">
       <div class="sheet-handle"></div>
       <div class="sheet-header">
-        <div class="sheet-title">🔑 OpenRouter API key</div>
-        <div class="sheet-sub">Free • No billing • Saved only on your device</div>
+        <div class="sheet-title">🔑 Groq API key</div>
+        <div class="sheet-sub">Free • No card • Saved only on your device</div>
       </div>
       <div class="sheet-body">
         <div class="security-note">🔒 Your API key is stored only in your phone's local storage. It is never sent to GitHub or anywhere else. Only Gemini's servers see it when you chat.</div>
         <div class="key-row">
           <div class="key-label">Gemini API key</div>
-          <input type="password" class="key-input" id="gemini-key" placeholder="Paste your key: sk-or-v1-..."/>
-          <div class="key-hint">Get free key at openrouter.ai → Sign up → Keys → Create key</div>
+          <input type="password" class="key-input" id="groq-key" placeholder="Paste your key: gsk_..."/>
+          <div class="key-hint">Get free key at console.groq.com → Sign up → API Keys → Create</div>
         </div>
         <div class="key-row" style="margin-top:4px">
           <div class="key-label">Your name (optional)</div>
@@ -410,7 +410,7 @@ function openOverlay(id){document.getElementById(id).classList.remove('hidden');
 function closeOverlay(id){document.getElementById(id).classList.add('hidden');}
 
 function openAISetup(){
-  const key=localStorage.getItem('openrouterKey');
+  const key=localStorage.getItem('groqKey');
   if(key){
     flash('AI already set up! Tap "Ask AI" on any topic card 🌸');
   } else {
@@ -419,25 +419,25 @@ function openAISetup(){
 }
 
 function saveApiKey(){
-  const key=document.getElementById('gemini-key').value.trim();
+  const key=document.getElementById('groq-key').value.trim();
   const name=document.getElementById('user-name').value.trim();
   if(!key||key.length<10){
-    document.getElementById('gemini-key').style.borderColor='var(--red)';
+    document.getElementById('groq-key').style.borderColor='var(--red)';
     flash('Please enter a valid OpenRouter key');
     return;
   }
-  document.getElementById('gemini-key').style.borderColor='';
-  localStorage.setItem('openrouterKey',key);
+  document.getElementById('groq-key').style.borderColor='';
+  localStorage.setItem('groqKey',key);
   if(name)localStorage.setItem('userName',name);
   document.getElementById('ai-btn').classList.add('active-btn');
   document.getElementById('ai-btn').textContent='✨ AI ✓';
   closeOverlay('key-overlay');
-  flash('OpenRouter AI ready! Tap "Ask AI" on any topic card 🌸');
+  flash('Groq AI ready! 🌸 Tap "Ask AI" on any topic card 🌸');
 }
 
 // ---- AI Chat ----
 function openChat(topicId){
-  const key=localStorage.getItem('openrouterKey');
+  const key=localStorage.getItem('groqKey');
   const t=topics.find(x=>x.id===topicId);
   if(!t)return;
 
@@ -445,7 +445,7 @@ function openChat(topicId){
   chatHistory=[];
 
   document.getElementById('chat-topic-title').textContent=t.topic;
-  document.getElementById('chat-topic-sub').textContent=t.subject+' • OpenRouter AI';
+  document.getElementById('chat-topic-sub').textContent=t.subject+' • Groq AI (Llama 3)';
   document.getElementById('chat-context-text').textContent=
     'Subject: '+t.subject+' | Topic: '+t.topic+(t.concepts?' | Key points: '+t.concepts:'');
   document.getElementById('chat-messages').innerHTML='';
@@ -482,7 +482,7 @@ async function sendChat(){
 function sendQuick(text){sendMessage(text);}
 
 async function sendMessage(userText){
-  const key=localStorage.getItem('openrouterKey');
+  const key=localStorage.getItem('groqKey');
   if(!key){openOverlay('key-overlay');return;}
 
   addMessage('user',userText);
@@ -497,19 +497,21 @@ async function sendMessage(userText){
     (t.concepts?', Key concepts: '+t.concepts:'')+
     '. Give clear, concise, exam-focused answers. Use bullet points for lists. Keep answers focused and relevant to MBBS exams.';
 
-  const openRouterBody={
-    model:'google/gemini-2.0-flash-lite-001:free',
+  const groqBody={
+    model:'llama-3.3-70b-versatile',
     messages:[
       {role:'system',content:systemContext},
       ...chatHistory.map(m=>({role:m.role==='model'?'assistant':'user',content:m.parts[0].text}))
-    ]
+    ],
+    temperature:0.7,
+    max_tokens:1024
   };
 
   try{
-    const res=await fetch('https://openrouter.ai/api/v1/chat/completions',{
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key,'HTTP-Referer':'https://riteshpathak421-design.github.io/medrevise/','X-Title':'MedRevise'},
-      body:JSON.stringify(openRouterBody)
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify(groqBody)
     });
     const data=await res.json();
     if(data.error){
@@ -641,7 +643,7 @@ if(!topics.length){
   save();
 }
 
-if(localStorage.getItem('openrouterKey')){
+if(localStorage.getItem('groqKey')){
   document.getElementById('ai-btn').classList.add('active-btn');
   document.getElementById('ai-btn').textContent='✨ AI ✓';
 }
