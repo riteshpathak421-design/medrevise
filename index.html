@@ -302,7 +302,7 @@
   </div>
 
   <!-- AI CHAT OVERLAY -->
-  <div class="overlay hidden" id="chat-overlay">
+  <div class="overlay hidden" id="chat-overlay" style="z-index:300">
     <div class="sheet" style="max-height:96vh">
       <div class="sheet-handle"></div>
       <div class="sheet-header" style="padding-bottom:10px">
@@ -314,23 +314,25 @@
           <button onclick="closeOverlay('chat-overlay')" style="background:none;border:none;font-size:20px;color:var(--hint);cursor:pointer;padding:0;margin-left:8px">✕</button>
         </div>
       </div>
-      <div style="padding:10px 20px 0;flex-shrink:0">
-        <div class="chat-context">
-          <div class="chat-context-title">Topic context loaded</div>
-          <div class="chat-context-text" id="chat-context-text"></div>
+      <div class="sheet-body" style="display:flex;flex-direction:column;padding:10px 0 0;overflow:hidden">
+        <div style="padding:0 20px;flex-shrink:0">
+          <div class="chat-context">
+            <div class="chat-context-title">Topic context loaded</div>
+            <div class="chat-context-text" id="chat-context-text"></div>
+          </div>
         </div>
-      </div>
-      <div class="chat-messages" id="chat-messages"></div>
-      <div class="chat-quick" id="chat-quick">
-        <button class="qbtn" onclick="sendQuick('Explain this topic in simple terms for MBBS')">Explain simply</button>
-        <button class="qbtn" onclick="sendQuick('Give me 5 high yield MCQs on this topic for MBBS exam with answers')">5 MCQs</button>
-        <button class="qbtn" onclick="sendQuick('Give me a easy mnemonic to remember the key points')">Mnemonic</button>
-        <button class="qbtn" onclick="sendQuick('What are the most important exam points from this topic?')">Exam points</button>
-        <button class="qbtn" onclick="sendQuick('What clinical conditions are associated with this topic?')">Clinical cases</button>
-      </div>
-      <div class="chat-input-row">
-        <input class="chat-input" id="chat-input" placeholder="Ask anything about this topic..." onkeydown="if(event.key==='Enter')sendChat()"/>
-        <button class="btn-send" onclick="sendChat()">↑</button>
+        <div class="chat-messages" id="chat-messages" style="flex:1;overflow-y:auto;padding:10px 20px;min-height:150px;max-height:300px"></div>
+        <div class="chat-quick" id="chat-quick">
+          <button class="qbtn" onclick="sendQuick('Explain this topic in simple terms for MBBS')">Explain simply</button>
+          <button class="qbtn" onclick="sendQuick('Give me 5 high yield MCQs on this topic for MBBS exam with answers')">5 MCQs</button>
+          <button class="qbtn" onclick="sendQuick('Give me a easy mnemonic to remember the key points')">Mnemonic</button>
+          <button class="qbtn" onclick="sendQuick('What are the most important exam points from this topic?')">Exam points</button>
+          <button class="qbtn" onclick="sendQuick('What clinical conditions are associated with this topic?')">Clinical cases</button>
+        </div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chat-input" placeholder="Ask anything about this topic..." onkeydown="if(event.key==='Enter')sendChat()"/>
+          <button class="btn-send" onclick="sendChat()">↑</button>
+        </div>
       </div>
     </div>
   </div>
